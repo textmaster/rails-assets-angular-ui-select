@@ -572,13 +572,16 @@ uis.controller('uiSelectCtrl',
         container = ctrl.searchInput.parent().parent()[0],
         calculateContainerWidth = function() {
           // Return the container width only if the search input is visible
-          return container.clientWidth * !!input.offsetParent;
+          if(!input.offsetParent) return 0;
+
+          var computedStyle = getComputedStyle(container);
+          return container.clientWidth - parseInt(computedStyle.paddingLeft);
         },
         updateIfVisible = function(containerWidth) {
           if (containerWidth === 0) {
             return false;
           }
-          var inputWidth = containerWidth - input.offsetLeft - 10;
+          var inputWidth = containerWidth - input.offsetLeft - 5;
           if (inputWidth < 50) inputWidth = containerWidth;
           ctrl.searchInput.css('width', inputWidth+'px');
           return true;
@@ -594,7 +597,7 @@ uis.controller('uiSelectCtrl',
           }
         });
       }
-    });
+    }, 200); // wait for TM animations
   };
 
   function _handleDropDownSelection(key) {
@@ -1074,8 +1077,6 @@ uis.directive('uiSelectMultiple', ['uiSelectMinErr','$timeout', function(uiSelec
       };
 
       ctrl.getPlaceholder = function(){
-        //Refactor single?
-        // if($select.selected.length) return;
         return $select.placeholder;
       };
 
